@@ -41,15 +41,19 @@ pub fn render(
     let width = usize::from(size.0);
     let field_rows = usize::from(size.1.saturating_sub(4));
     let border = if ascii { '-' } else { '─' };
-    let corner = if ascii { '+' } else { '┼' };
+    let (top_left, top_right, bottom_left, bottom_right) = if ascii {
+        ('+', '+', '+', '+')
+    } else {
+        ('┌', '┐', '└', '┘')
+    };
     let side = if ascii { '|' } else { '│' };
     let ball = if ascii { 'o' } else { '●' };
     let mut lines = Vec::with_capacity(usize::from(size.1));
     lines.push(format!(
         "{}{}{}",
-        corner,
+        top_left,
         border.to_string().repeat(width - 2),
-        corner
+        top_right
     ));
     lines.push(frame_line(
         &format!(
@@ -64,8 +68,9 @@ pub fn render(
 
     let mut body_cells = vec![vec![' '; width - 2]; field_rows];
     for body in &world.bodies {
-        let x = body.position.x.round() as isize;
-        let y = (body.position.y / CELL_ASPECT).round() as isize;
+        let x = (body.position.x.round() as isize).clamp(0, (width - 3) as isize);
+        let y =
+            ((body.position.y / CELL_ASPECT).round() as isize).clamp(0, (field_rows - 1) as isize);
         if let (Ok(x), Ok(y)) = (usize::try_from(x), usize::try_from(y))
             && let Some(row) = body_cells.get_mut(y)
             && let Some(cell) = row.get_mut(x)
@@ -89,9 +94,9 @@ pub fn render(
     ));
     lines.push(format!(
         "{}{}{}",
-        corner,
+        bottom_left,
         border.to_string().repeat(width - 2),
-        corner
+        bottom_right
     ));
 
     let frame = lines.join("\r\n");
