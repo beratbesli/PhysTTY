@@ -1,0 +1,11 @@
+[package]
+name = "phystty"
+version = "0.1.0"
+edition = "2024"
+description = "A lightweight real-time 2D physics sandbox rendered in the terminal"
+license = "MIT"
+repository = "https://github.com/beratbesli/PhysTTY"
+readme = "README.md"
+
+[dependencies]
+crossterm = "0.29"
