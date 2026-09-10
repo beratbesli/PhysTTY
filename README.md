@@ -67,6 +67,11 @@ cargo build --release
 
 PhysTTY favors a small, explicit architecture over a general-purpose engine. The simulation uses float-based positions, a fixed physics timestep, simple circles, and terminal-friendly rendering. Every feature should make the sandbox easier to understand or more pleasant to use.
 
+The automated checks run formatting, clippy, tests, and a release build on
+Linux, macOS, and Windows. Terminal rendering still depends on the host
+terminal's capabilities; the physics tests are deterministic and do not need a
+real terminal.
+
 ## Roadmap
 
 - More static obstacles while keeping collision rules simple
@@ -74,3 +79,7 @@ PhysTTY favors a small, explicit architecture over a general-purpose engine. The
 - Small deterministic scenario presets
 
 Features outside the core terminal sandbox are intentionally out of scope for the first release.
+
+## License
+
+PhysTTY is released under the [MIT License](LICENSE).
