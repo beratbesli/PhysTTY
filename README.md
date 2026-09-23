@@ -24,7 +24,7 @@ PhysTTY turns a terminal window into a small physics playground. Balls fall unde
 - Fixed-timestep gravity and velocity integration
 - Boundary collisions with restitution and penetration correction
 - Circle-to-circle collisions
-- Runtime spawning, pause, reset, clear, and gravity controls
+- Runtime spawning (up to 64 balls), pause, reset, clear, and gravity controls
 - Alternate-screen rendering with hidden cursor and terminal cleanup
 - Resize-aware simulation area and compact HUD
 - Optional ASCII rendering with `PHYSTTY_ASCII=1`
@@ -45,7 +45,7 @@ The terminal should be at least 24 columns by 8 rows. Press `Q` or `Esc` to quit
 
 | Key | Action |
 | --- | --- |
-| `Space` | Spawn a ball |
+| `Space` | Spawn a ball, up to 64 total |
 | `G` | Toggle gravity |
 | `P` | Pause or resume |
 | `R` | Reset the initial scene |
