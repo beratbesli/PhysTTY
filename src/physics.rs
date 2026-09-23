@@ -4,6 +4,7 @@ const DEFAULT_GRAVITY: f32 = 28.0;
 const BODY_RADIUS: f32 = 0.8;
 const RESTITUTION: f32 = 0.82;
 const SETTLE_SPEED: f32 = 1.0;
+pub const MAX_BODIES: usize = 64;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Vec2 {
@@ -98,7 +99,7 @@ impl Body {
 
 #[derive(Debug)]
 pub struct PhysicsWorld {
-    pub bodies: Vec<Body>,
+    bodies: Vec<Body>,
     pub bounds: Bounds,
     pub gravity_enabled: bool,
     gravity: Vec2,
@@ -114,6 +115,10 @@ impl PhysicsWorld {
             gravity: Vec2::new(0.0, DEFAULT_GRAVITY),
             spawn_count: 0,
         }
+    }
+
+    pub fn bodies(&self) -> &[Body] {
+        &self.bodies
     }
 
     pub fn step(&mut self, dt: f32) {
@@ -175,7 +180,11 @@ impl PhysicsWorld {
 
     pub fn spawn_ball(&mut self) {
         let radius = BODY_RADIUS;
-        if self.bounds.width < radius * 2.0 || self.bounds.height < radius * 2.0 {
+        // Pairwise collision work is bounded to 64 * 63 / 2 checks per step.
+        if self.bodies.len() >= MAX_BODIES
+            || self.bounds.width < radius * 2.0
+            || self.bounds.height < radius * 2.0
+        {
             return;
         }
 
@@ -346,5 +355,21 @@ mod tests {
 
         assert_eq!(world.bodies.len(), 3);
         assert!(world.gravity_enabled);
+    }
+
+    #[test]
+    fn repeated_spawns_stop_at_collision_budget_and_resume_after_clear() {
+        let mut world = PhysicsWorld::new(Bounds::new(80.0, 80.0));
+        world.reset();
+        for _ in 0..10_000 {
+            world.spawn_ball();
+        }
+        assert_eq!(world.bodies.len(), MAX_BODIES);
+        assert_eq!(world.spawn_count, MAX_BODIES - 3);
+        assert_eq!(MAX_BODIES * (MAX_BODIES - 1) / 2, 2_016);
+
+        world.clear_dynamic();
+        world.spawn_ball();
+        assert_eq!(world.bodies.len(), 1);
     }
 }

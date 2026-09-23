@@ -7,7 +7,7 @@ use crossterm::{
     terminal::{Clear, ClearType},
 };
 
-use crate::physics::{Bounds, PhysicsWorld};
+use crate::physics::{Bounds, MAX_BODIES, PhysicsWorld};
 
 const CELL_ASPECT: f32 = 2.0;
 const MIN_COLUMNS: u16 = 24;
@@ -57,8 +57,9 @@ pub fn render(
     ));
     lines.push(frame_line(
         &format!(
-            " PhysTTY | Bodies: {} | Gravity: {} | {} ",
-            world.bodies.len(),
+            " PhysTTY | Bodies: {}/{} | Gravity: {} | {} ",
+            world.bodies().len(),
+            MAX_BODIES,
             if world.gravity_enabled { "ON" } else { "OFF" },
             if paused { "Paused" } else { "Running" }
         ),
@@ -67,7 +68,7 @@ pub fn render(
     ));
 
     let mut body_cells = vec![vec![' '; width - 2]; field_rows];
-    for body in &world.bodies {
+    for body in world.bodies() {
         let x = (body.position.x.round() as isize).clamp(0, (width - 3) as isize);
         let y =
             ((body.position.y / CELL_ASPECT).round() as isize).clamp(0, (field_rows - 1) as isize);
